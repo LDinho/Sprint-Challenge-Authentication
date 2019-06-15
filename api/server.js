@@ -12,4 +12,8 @@ server.use(express.json());
 
 configureRoutes(server);
 
+server.get('/', (req, res) => {
+  res.send(`<p>Authentication Test</p>`);
+});
+
 module.exports = server;
