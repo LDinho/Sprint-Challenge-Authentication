@@ -21,8 +21,38 @@ module.exports = server => {
   server.get('/api/jokes', authenticate, getJokes);
 };
 
-function register(req, res) {
-  // implement user registration
+async function register(req, res) {
+  const user = req.body;
+  const { username, password } = user;
+
+  const hash = bcrypt.hashSync(password, 12);
+  user.password = hash;
+
+  try {
+    if (!username || !password) {
+      return res.status(400)
+        .json({
+          errorMessage: "registration info missing."
+        });
+    }
+
+    const userAdded = await addUser(user);
+    const token = generateToken(user); // use of the jwt library
+
+    return res.status(201)
+      .json({
+        user: userAdded,
+        authToken: token,
+      });
+
+  }
+  catch (err) {
+    res.status(500)
+      .json({
+        err: err.message,
+        error: `Server error`
+      })
+  }
 }
 
 function login(req, res) {
